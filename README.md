@@ -1,35 +1,30 @@
 # Codex Usage Watch
 
-A small personal project that estimates how much of the old five-hour Codex
-allowance you have used. It reads the weekly percentage already recorded by
-Codex and turns the change into a local estimate:
+A local Rust command that estimates five-hour Codex usage from rate-limit data
+already written to your Codex session files. It stores the estimate in a local
+SQLite database and does not contact an external usage service.
 
 ```text
 5h est 158% · week +25.0%
 ```
 
-- `5h est 158%` means about 1.58 times the old five-hour allowance.
+- `5h est 158%` means about 1.58 times the calibration value used by the
+  tracker.
 - `week +25.0%` means weekly usage increased by 25 percentage points during
-  this five-hour window.
+  the current local window.
 - The estimate can go above 100%. Nothing is blocked.
 
 This is only a local estimate, not official OpenAI usage or billing data.
 
 ## Project status
 
-**Completed personal project.** The planned tracker is feature-complete and its
-scope is now frozen. It remains an experimental beta because the number is a
-local estimate rather than an official account limit. Future work is limited to
-important fixes and compatibility maintenance; the unfinished ideas in
-`notes/plan.md` are not part of the completed scope.
+The project is an experimental beta. The estimate is local and is not an
+official OpenAI usage or billing value. See the available artifacts on the
+[GitHub releases page](https://github.com/snikmas/codex-watch/releases).
 
-The latest public release is
-[`v0.1.0-beta.1`](https://github.com/snikmas/codex-watch/releases/tag/v0.1.0-beta.1).
-The core tracker, reset-aware accounting, privacy controls, packaging, upgrade
-and rollback checks, and automated Ubuntu/macOS artifact lifecycles are
-implemented. Optional long-term and independent-user observations remain in
-[acceptance evidence](docs/ACCEPTANCE.md); they are useful follow-up evidence,
-not unfinished product features.
+The project includes reset-aware accounting, privacy controls, install and
+rollback checks, and automated Ubuntu and macOS artifact workflows. Optional
+independent-user evidence is described in [acceptance evidence](docs/ACCEPTANCE.md).
 
 ## Supported systems
 
@@ -41,12 +36,12 @@ not unfinished product features.
 | Windows | **Unsupported** | Rust build/tests run in CI, but there is no native installer, artifact, hook lifecycle, or WSL support claim. |
 | Other Linux systems | **Unsupported/best effort** | They may work from source, but only the exact Ubuntu target above is claimed. |
 
-Codex CLI is required on every system. “Supported” here describes the tested
+Codex CLI is required on every system. "Supported" here describes the tested
 project lifecycle, not the accuracy of an official OpenAI quota value.
 
-## Four ways to see the output
+## See the estimate
 
-### 1. Terminal
+### Terminal
 
 ```bash
 codex-watch status
@@ -54,7 +49,7 @@ codex-watch status
 
 ![codex-watch status in a terminal](docs/images/terminal-status.png)
 
-Other useful commands:
+Use these commands to inspect the local data:
 
 ```bash
 codex-watch refresh     # look for newer usage data
@@ -63,7 +58,7 @@ codex-watch analyze     # show how the estimate was calculated
 codex-watch doctor      # check the local setup
 ```
 
-### 2. Codex status line
+### Optional Codex integrations
 
 ```text
 5h est 158% · week +25.0%
@@ -71,19 +66,16 @@ codex-watch doctor      # check the local setup
 
 ![Codex Usage Watch in the Codex status line](docs/images/statusline.png)
 
-The normal Codex CLI cannot add this project to `/statusline`. The screenshot
-uses a small custom Codex build with the `local-five-hour-limit` item. This part
-is optional and is not installed by the setup below.
-
-### 3. Codex `/status`
+The screenshots for `/statusline` and `/status` use a separate custom Codex
+build. The normal Codex CLI does not install those display rows. The terminal
+command and hooks work without that build.
 
 ![Codex Usage Watch details in the custom Codex status screen](docs/images/codex-status.png)
 
 The same custom build adds **Five-hour estimate** and **Weekly cost** to
-`/status`. The normal Codex CLI does not show these rows, so use
-`codex-watch status` for the same details.
+`/status`. Use `codex-watch status` with the normal Codex CLI.
 
-### 4. Hook messages inside Codex
+### Hook messages inside Codex
 
 ![Automatic Codex Usage Watch hook notice](docs/images/hook-notice.png)
 
@@ -94,7 +86,7 @@ silently. If a hook fails, Codex continues normally.
 `/hooks` is only where you review and trust the hooks; it is not another status
 screen.
 
-## Install
+## Install the tracker
 
 The published experimental beta targets Ubuntu 25.10 x86_64. For other systems,
 follow the status table above rather than assuming that a successful build means
@@ -115,9 +107,7 @@ The archive contains a prebuilt binary, so this path does not require Rust or
 Git. The installer puts `codex-watch` in `~/.local/bin`, adds three Codex hooks,
 does not replace Codex, and does not need `sudo`.
 
-Contributors can instead install from source with Rust 1.85 or newer:
-
-Clone the project and run:
+To install from source, use Rust 1.85 or newer. Clone the project and run:
 
 ```bash
 git clone https://github.com/snikmas/codex-watch.git
@@ -134,9 +124,8 @@ Start tracking from now:
 "$HOME/.local/bin/codex-watch" status
 ```
 
-Then restart Codex, open `/hooks`, review and trust `SessionStart`,
-`UserPromptSubmit`, and `Stop`, and start a new Codex session. You can check the
-setup with:
+Restart Codex. Open `/hooks`, review the `SessionStart`, `UserPromptSubmit`, and
+`Stop` commands, trust them, and start a new session. Check the setup with:
 
 ```bash
 "$HOME/.local/bin/codex-watch" doctor
@@ -145,7 +134,7 @@ setup with:
 If `codex-watch` is not found in a new terminal, either use the full path above
 or add `~/.local/bin` to your `PATH`.
 
-## Configure
+## Configure the local tracker
 
 The simplest configuration starts tracking from the moment you install:
 
@@ -155,9 +144,8 @@ codex-watch doctor
 codex-watch status
 ```
 
-Restart Codex, open `/hooks`, inspect and trust `SessionStart`,
-`UserPromptSubmit`, and `Stop`, then start a fresh Codex session. The tracker
-cannot approve its own hooks; `doctor` verifies their paths and definitions.
+The tracker cannot approve its own hooks. `doctor` verifies their paths and
+definitions.
 
 Optional environment settings:
 
