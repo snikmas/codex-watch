@@ -27,7 +27,7 @@ jobs:
         with:
           ref: v0.1.0-beta.1
           path: prior-source
-      - uses: dtolnay/rust-toolchain@2c7215f132e9ebf062739d9130488b56d53c060c # master, reviewed 2026-07-15
+      - uses: dtolnay/rust-toolchain@683b588c487a69d01f6c6ddf40f036ff682cc2c8 # master, reviewed 2026-07-15
         with:
           toolchain: stable
           components: rustfmt, clippy
